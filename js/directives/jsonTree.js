@@ -1,4 +1,19 @@
 angular.module('panelApp').directive('batJsonTree', function($compile) {
+  // escape function from lodash
+  var reUnescapedString = /['\n\r\t\u2028\u2029\\]/g;
+  var htmlEscapes = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  function escapeHtmlChar(match) {
+    return htmlEscapes[match];
+  }
+  function escape(string) {
+    return string == null ? '' : String(string).replace(reUnescapedHtml, escapeHtmlChar);
+  }
   return {
     restrict: 'E',
     terminal: true,
@@ -27,6 +42,8 @@ angular.module('panelApp').directive('batJsonTree', function($compile) {
             }
           }
           html += ' ]</div>';
+        } else if (object instanceof EventTarget) {
+          html += '<span>' + escape(object.toString()) + '</span>';
         } else if (object instanceof Object) {
           html += ' { ';
           for (prop in object) {
@@ -36,7 +53,7 @@ angular.module('panelApp').directive('batJsonTree', function($compile) {
           }
           html += ' } ';
         } else {
-          html += '<span>' + object.toString() + '</span>';
+          html += '<span>' + escape(object.toString()) + '</span>';
         }
         return html;
       };
